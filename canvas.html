@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SI 539 waiver - Canvas program </title>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript">
+        var canvas = document.getElementById("drawingCanvas");
+        var ctx= canvas.getContext("2d");
+        canvas.width= window.innerWidth;
+        canvas.height= window.innerHeight;
+
+        ctx.fillStyle = "red";
+        ctx.fillRect(15, 15, 15, 15);
+        ctx.fill();
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+
+        ctx.beginPath();
+//http://www.williammalone.com/articles/create-html5-canvas-javascript-drawing-app/
+        //https://simonsarris.com/making-html5-canvas-useful/
+
+
+//
+//        let isDrawing = false;
+//        let lastX= 0;
+//        let lastY= 0;
+//
+//        function draw(e){
+//            if (!isDrawing) return;
+//
+//            console.log(e);
+//            ctx.beginPath();
+//            ctx.moveTo(lastX, lastY);
+//            ctx.lineTo(e.offsetX, e.offsetY);
+//            ctx.stroke();
+//            [lastX, lastY] = [e.offsetX, e.offsetY];
+//        }
+//
+//        canvas.addEventListener('mousemove',draw);
+
+var canvas, ctx, flag = false,
+    prevX = 0,
+    currX = 0,
+    prevY = 0,
+    currY = 0,
+    dot_flag = false;
+
+var x = "black",
+    y = 2;
+
+function init() {
+    canvas = document.getElementById('can');
+    ctx = canvas.getContext("2d");
+    w = canvas.width;
+    h = canvas.height;
+
+    canvas.addEventListener("mousemove", function (e) {
+        findxy('move', e)
+    }, false);
+    canvas.addEventListener("mousedown", function (e) {
+        findxy('down', e)
+    }, false);
+    canvas.addEventListener("mouseup", function (e) {
+        findxy('up', e)
+    }, false);
+    canvas.addEventListener("mouseout", function (e) {
+        findxy('out', e)
+    }, false);
+}
+
+function color(obj) {
+    switch (obj.id) {
+        case "green":
+            x = "green";
+            break;
+        case "blue":
+            x = "blue";
+            break;
+        case "red":
+            x = "red";
+            break;
+        case "yellow":
+            x = "yellow";
+            break;
+        case "orange":
+            x = "orange";
+            break;
+        case "black":
+            x = "black";
+            break;
+        case "white":
+            x = "white";
+            break;
+    }
+    if (x == "white") y = 14;
+    else y = 2;
+
+}
+
+function draw() {
+    ctx.beginPath();
+    ctx.moveTo(prevX, prevY);
+    ctx.lineTo(currX, currY);
+    ctx.strokeStyle = x;
+    ctx.lineWidth = y;
+    ctx.stroke();
+    ctx.closePath();
+}
+
+function erase() {
+    var m = confirm("Want to clear");
+    if (m) {
+        ctx.clearRect(0, 0, w, h);
+        document.getElementById("canvasimg").style.display = "none";
+    }
+}
+
+function save() {
+    document.getElementById("canvasimg").style.border = "2px solid";
+    var dataURL = canvas.toDataURL();
+    document.getElementById("canvasimg").src = dataURL;
+    document.getElementById("canvasimg").style.display = "inline";
+}
+
+function findxy(res, e) {
+    if (res == 'down') {
+        prevX = currX;
+        prevY = currY;
+        currX = e.clientX - canvas.offsetLeft;
+        currY = e.clientY - canvas.offsetTop;
+
+        flag = true;
+        dot_flag = true;
+        if (dot_flag) {
+            ctx.beginPath();
+            ctx.fillStyle = x;
+            ctx.fillRect(currX, currY, 2, 2);
+            ctx.closePath();
+            dot_flag = false;
+        }
+    }
+    if (res == 'up' || res == "out") {
+        flag = false;
+    }
+    if (res == 'move') {
+        if (flag) {
+            prevX = currX;
+            prevY = currY;
+            currX = e.clientX - canvas.offsetLeft;
+            currY = e.clientY - canvas.offsetTop;
+            draw();
+        }
+    }
+}
+    </script>
+    <style>
+        #drawingCanvas{
+            width:80vw;
+            height: 80vh;
+            /*background-color:green;*/
+        }
+    </style>
+</head>
+<body>
+
+<h1>SI 539 waiver - Canvas program</h1>
+<p>created by Sophie Niu</p>
+<br/>
+<br/>
+<!--<canvas id="drawingCanvas" style="border:2px solid #a52a2a;"></canvas>-->
+
+
+
+<canvas id="can" width="400" height="400" style="position:relative;top:10%;left:10%;border:2px solid;"></canvas>
+<div style="position:absolute;top:12%;left:43%;">Choose Color</div>
+<div style="position:absolute;top:15%;left:45%;width:10px;height:10px;background:green;" id="green" onclick="color(this)"></div>
+<div style="position:absolute;top:15%;left:46%;width:10px;height:10px;background:blue;" id="blue" onclick="color(this)"></div>
+<div style="position:absolute;top:15%;left:47%;width:10px;height:10px;background:red;" id="red" onclick="color(this)"></div>
+<div style="position:absolute;top:17%;left:45%;width:10px;height:10px;background:yellow;" id="yellow" onclick="color(this)"></div>
+<div style="position:absolute;top:17%;left:46%;width:10px;height:10px;background:orange;" id="orange" onclick="color(this)"></div>
+<div style="position:absolute;top:17%;left:47%;width:10px;height:10px;background:black;" id="black" onclick="color(this)"></div>
+<div style="position:absolute;top:20%;left:43%;">Eraser</div>
+<div style="position:absolute;top:22%;left:45%;width:15px;height:15px;background:white;border:2px solid;" id="white" onclick="color(this)"></div>
+<img id="canvasimg" style="position:absolute;top:10%;left:52%;" style="display:none;">
+<input type="button" value="save" id="btn" size="30" onclick="save()" style="position:absolute;top:55%;left:10%;">
+<input type="button" value="clear" id="clr" size="23" onclick="erase()" style="position:absolute;top:55%;left:15%;">
+
+
+
+<br/>
+<p>instructions<br/>
+    --An objective of this assignment is to demonstrate that you can use Listeners to update the Canvas element.  You should use listeners, not events within the elements.</p>
+<p>Steps:</p>
+<ol>
+    <li>Create a canvas element with a border. The canvas should be about 80% the width and 80% height of the screen. If the window is dynamically resized, you do not need to resize the canvas, but if I use Inspect element to switch to different device size it should. </li>
+    <!--<li>-->
+        <span>
+            <li>Create a "pen" that moves with the mouse by drawing a 30x30 pixel rectangle in the position of the mouse.  The square should be perfectly centered around the mouse, not off to the side. The default color should be red.
+            </li>
+            <ol>
+                <li>Note - if you move the mouse very quickly the line will be choppy, that is okay.</li>
+                <li>Note - I should NOT need to drag the mouse, just move it across the screen</li>
+            </ol>
+        </span>
+    <!--</li>-->
+    <li>Change the pen color by  pressing the "b" key for blue, the "g" key for green, the "r" key for red, and the "y" key for yellow.  Make sure it doesn't change the color of the entire picture, just the lines that come next.   </li>
+    <li>Use the up arrow to "pick up" the pen.  When you mouse nothing should  be drawn.  Use the down  arrow keys to place the pen back on the Canvas.</li>
+    <li>Clear the canvas by using the space bar.  </li>
+    <li>React to touch events the same way you react to the mouse movements.  </li>
+    <li>On a mobile device changing the orientation should clear and resize the canvas. This may be tricky so do what you need to do to make it work. (It may be more dramatic than "clearing" the canvas.  </li>
+    <li>Add a color picker that allows the user to choose a different color. This won't work in Safari (on mobile), thats okay.</li>
+</ol>
+<br/>
+
+</body>
+</html>
+
+<!--An objective of this assignment is to demonstrate that you can use Listeners to update the Canvas element.  You should use listeners, not events within the elements.
+Test your program!!!
+Do not write ANY code you don't understand
+ 
+Submission:
+Upload the assignment to Github and submit the link to the deployed page (not the code).
+-->
