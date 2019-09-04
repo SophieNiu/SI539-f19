@@ -1,1 +1,1 @@
-# SI539waiver-student-canvas
+# SI539
